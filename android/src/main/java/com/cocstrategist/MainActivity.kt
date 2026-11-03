@@ -59,7 +59,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.sp
-import kotlin.math.min
+import kotlin.math.roundToInt
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -226,31 +226,24 @@ private fun PlanningCanvas(
             .background(Color(0xFF101820))
             .pointerInput(bitmap, selectedRole) {
                 detectTapGestures { tap ->
-                    val scale = min(size.width.toFloat() / bitmap.width, size.height.toFloat() / bitmap.height)
-                    val imageWidth = bitmap.width * scale
-                    val imageHeight = bitmap.height * scale
-                    val left = (size.width - imageWidth) / 2f
-                    val top = (size.height - imageHeight) / 2f
-                    val inside = tap.x >= left && tap.x <= left + imageWidth &&
-                        tap.y >= top && tap.y <= top + imageHeight
-                    if (inside && imageWidth > 0f && imageHeight > 0f) {
-                        onAddMarker(
-                            ((tap.x - left) / imageWidth).coerceIn(0f, 1f),
-                            ((tap.y - top) / imageHeight).coerceIn(0f, 1f)
-                        )
+                    val viewport = ImageViewport.fit(
+                        size.width.toFloat(), size.height.toFloat(), bitmap.width, bitmap.height
+                    )
+                    viewport.mapToNormalizedPoint(tap.x, tap.y)?.let { point ->
+                        onAddMarker(point.x, point.y)
                     }
                 }
             }
     ) {
-        val scale = min(size.width / bitmap.width, size.height / bitmap.height)
-        val imageWidth = (bitmap.width * scale).toInt()
-        val imageHeight = (bitmap.height * scale).toInt()
-        val left = (size.width.toInt() - imageWidth) / 2
-        val top = (size.height.toInt() - imageHeight) / 2
+        val viewport = ImageViewport.fit(size.width, size.height, bitmap.width, bitmap.height)
+        val left = viewport.left
+        val top = viewport.top
+        val imageWidth = viewport.width
+        val imageHeight = viewport.height
         drawImage(
             image = bitmap.asImageBitmap(),
-            dstOffset = IntOffset(left, top),
-            dstSize = IntSize(imageWidth, imageHeight)
+            dstOffset = IntOffset(left.roundToInt(), top.roundToInt()),
+            dstSize = IntSize(imageWidth.roundToInt(), imageHeight.roundToInt())
         )
 
         markers.forEach { marker ->
