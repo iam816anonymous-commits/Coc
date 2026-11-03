@@ -83,7 +83,7 @@ private fun PlannerScreen() {
     var armyNotes by remember { mutableStateOf("") }
     val markers = remember { mutableStateListOf<PlanMarker>() }
 
-    val imagePicker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+    val imagePicker = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
         if (uri != null) {
             runCatching {
                 decodeScaledBitmap(context, uri)
@@ -117,7 +117,7 @@ private fun PlannerScreen() {
             }
         }
 
-        Button(onClick = { imagePicker.launch("image/*") }, modifier = Modifier.fillMaxWidth()) {
+        Button(onClick = { imagePicker.launch(ActivityResultContracts.PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) }, modifier = Modifier.fillMaxWidth()) {
             Text(if (screenshot == null) "Import base screenshot" else "Choose another screenshot")
         }
 
