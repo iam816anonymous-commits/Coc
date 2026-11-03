@@ -55,6 +55,7 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.sp
 import kotlin.math.min
 
@@ -73,6 +74,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 private fun PlannerScreen() {
+    val context = LocalContext.current
     var screenshot by remember { mutableStateOf<Bitmap?>(null) }
     var selectedRole by remember { mutableStateOf(MarkerRole.MAIN_ARMY) }
     var townHall by remember { mutableStateOf("") }
@@ -82,7 +84,7 @@ private fun PlannerScreen() {
     val imagePicker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         if (uri != null) {
             runCatching {
-                contentResolverForCurrentActivity?.openInputStream(uri)?.use(BitmapFactory::decodeStream)
+                context.contentResolver.openInputStream(uri)?.use { input -> BitmapFactory.decodeStream(input) }
             }.getOrNull()?.let {
                 screenshot = it
                 markers.clear()
