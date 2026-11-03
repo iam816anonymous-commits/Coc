@@ -4,7 +4,7 @@
 
 ## Implemented in repository
 
-- Android Gradle project and Kotlin/Jetpack Compose app module.
+- Android Gradle project and Kotlin 2.3.0 / Jetpack Compose app module.
 - Minimal app manifest, application entry point, and initial UI.
 - System image picker for deliberate screenshot import.
 - Bounded image decoding (longest dimension sampled to approximately 2048 px) to reduce memory pressure.
