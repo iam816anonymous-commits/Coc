@@ -286,9 +286,7 @@ private fun decodeScaledBitmap(context: Context, uri: Uri): Bitmap? {
 
     val maxDimension = 2048
     var sampleSize = 1
-    while (bounds.outWidth / (sampleSize * 2) >= maxDimension &&
-        bounds.outHeight / (sampleSize * 2) >= maxDimension
-    ) {
+    while (maxOf(bounds.outWidth, bounds.outHeight) / (sampleSize * 2) >= maxDimension) {
         sampleSize *= 2
     }
 
