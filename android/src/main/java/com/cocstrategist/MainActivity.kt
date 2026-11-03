@@ -2,6 +2,8 @@ package com.cocstrategist
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.net.Uri
+import android.content.Context
 import android.graphics.Paint as NativePaint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -84,7 +86,7 @@ private fun PlannerScreen() {
     val imagePicker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         if (uri != null) {
             runCatching {
-                context.contentResolver.openInputStream(uri)?.use { input -> BitmapFactory.decodeStream(input) }
+                decodeScaledBitmap(context, uri)
             }.getOrNull()?.let {
                 screenshot = it
                 markers.clear()
@@ -266,5 +268,32 @@ private fun PlanningCanvas(
                 canvas.nativeCanvas.drawText(marker.id.toString(), center.x, center.y + paint.textSize * 0.35f, paint)
             }
         }
+    }
+}
+
+
+/**
+ * Decode user-selected screenshots with bounded dimensions to avoid loading
+ * multi-megapixel gallery images at their full allocation size.
+ */
+private fun decodeScaledBitmap(context: Context, uri: Uri): Bitmap? {
+    val bounds = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+    context.contentResolver.openInputStream(uri)?.use { input ->
+        BitmapFactory.decodeStream(input, null, bounds)
+    } ?: return null
+
+    if (bounds.outWidth <= 0 || bounds.outHeight <= 0) return null
+
+    val maxDimension = 2048
+    var sampleSize = 1
+    while (bounds.outWidth / (sampleSize * 2) >= maxDimension &&
+        bounds.outHeight / (sampleSize * 2) >= maxDimension
+    ) {
+        sampleSize *= 2
+    }
+
+    val options = BitmapFactory.Options().apply { inSampleSize = sampleSize }
+    return context.contentResolver.openInputStream(uri)?.use { input ->
+        BitmapFactory.decodeStream(input, null, options)
     }
 }
