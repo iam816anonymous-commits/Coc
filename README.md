@@ -33,7 +33,7 @@ This repository therefore implements an independent screenshot annotation founda
 
 ## Build
 
-Open the repository root in Android Studio and sync Gradle. The project uses JDK 17, Android Gradle Plugin 8.13.2, Gradle 8.13, and Android SDK 36.
+Open the repository root in Android Studio and sync Gradle. The project uses JDK 17, Android Gradle Plugin 8.13.0, Gradle 8.13, and Android SDK 36.
 
 From a shell with Android SDK configured and Gradle 8.13 installed:
 
