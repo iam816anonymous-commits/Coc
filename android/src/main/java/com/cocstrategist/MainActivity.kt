@@ -152,6 +152,12 @@ private fun PlannerScreen() {
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
+            if (markers.isNotEmpty()) {
+                Text("Placement notes", style = MaterialTheme.typography.titleSmall)
+                markers.forEach { marker ->
+                    Text("#${marker.id} · ${marker.label} · x=${"%.2f".format(marker.x)}, y=${"%.2f".format(marker.y)}")
+                }
+            }
         }
 
         Text("Marker type", style = MaterialTheme.typography.titleMedium)
