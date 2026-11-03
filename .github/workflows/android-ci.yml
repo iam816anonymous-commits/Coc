@@ -10,6 +10,10 @@ on:
 permissions:
   contents: read
 
+env:
+  ANDROID_HOME: /usr/local/lib/android/sdk
+  ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -28,17 +32,30 @@ jobs:
         with:
           gradle-version: "8.13"
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+      # The GitHub-hosted Ubuntu image already includes Android command-line
+      # tools. Avoid android-actions/setup-android's interactive license prompt
+      # and its obsolete "tools" package, which no longer exists in sdkmanager.
+      - name: Accept Android SDK licenses
+        run: yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --licenses
 
       - name: Install Android SDK packages
-        run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
+        run: |
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" \
+            "platform-tools" \
+            "platforms;android-36" \
+            "build-tools;36.0.0"
+
+      - name: Verify Android SDK
+        run: |
+          test -d "$ANDROID_HOME/platforms/android-36"
+          test -d "$ANDROID_HOME/build-tools/36.0.0"
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --list_installed
 
       - name: Run unit tests
-        run: gradle :android:testDebugUnitTest
+        run: gradle --no-daemon :android:testDebugUnitTest
 
       - name: Assemble debug APK
-        run: gradle :android:assembleDebug
+        run: gradle --no-daemon :android:assembleDebug
 
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
