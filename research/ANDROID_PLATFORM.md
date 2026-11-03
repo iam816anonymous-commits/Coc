@@ -59,7 +59,7 @@ This project does not use AccessibilityService to inspect or operate Clash of Cl
 ## Build configuration
 
 - JDK 17.
-- Android Gradle Plugin 8.13.2.
+- Android Gradle Plugin 8.13.0.
 - Gradle 8.13 in GitHub Actions.
 - Compose BOM 2025.08.01.
 - Android SDK platform 36 / build tools 36.0.0.
